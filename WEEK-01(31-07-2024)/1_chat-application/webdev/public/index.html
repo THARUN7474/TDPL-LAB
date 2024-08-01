@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat App</title>
+    <style>
+        #messages {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        #messages li {
+            padding: 8px;
+            margin-bottom: 2px;
+            background-color: #f3f3f3;
+            border-radius: 4px;
+        }
+
+        #form {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            display: flex;
+            background-color: #fff;
+            padding: 10px;
+            box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+        }
+
+        #input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+
+        button {
+            background-color: rgb(41, 164, 225);
+            padding: 10px;
+            border: none;
+            color: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .username {
+            font-weight: bold;
+        }
+
+        .timestamp {
+            font-size: 0.8em;
+            color: #888;
+        }
+
+        #typingIndicator {
+            margin-top: 5px;
+            font-style: italic;
+            color: #888;
+        }
+
+        .set1 {
+            width: 80%;
+            margin: 0 auto;
+            text-align: center;
+            padding: 10px;
+            background-color: lightgray;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div>
+        <h1>Chat App</h1>
+        <p>Welcome to the chat app!</p>
+        <p>Press "Enter" to send messages.</p>
+        <div id="typingIndicator"></div>
+    </div>
+    <div class="set1">
+        <ul id="messages"></ul>
+    </div>
+    
+    <form id="form" action="">
+        <input id="input" autocomplete="off" placeholder="Enter your message here:" />
+        <button>Send</button>
+    </form>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="client.js"></script>
+</body>
+</html>
