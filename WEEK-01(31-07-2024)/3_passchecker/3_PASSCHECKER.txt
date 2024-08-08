@@ -1,0 +1,153 @@
+from passstrengthchecker import PasswordChecker
+
+
+def check_complexity(passw):
+    checker = PasswordChecker(passw)
+    if checker.is_strong_password():
+        score, strength = checker.password_strength_checker()
+        print(f"Password: {passw}, Score: {score}, Strength: {strength}")
+    else:
+        print(f"Password: {passw} is not strong enough.")
+        score, strength = checker.password_strength_checker()
+        print(f"you score will be this")
+        print(f"Password: {passw}, Score: {score}, Strength: {strength}")
+
+
+# Example usage
+print('''
+    some metrics used to find strength of passwords:
+        # Rule 1: Length
+        # Rule 2: Character types
+        # Rule 3: (simplified check, in realitywe will have ./.  personal details) checked with most common passwords
+        # Rule 4: Avoid maxm sequential characters and all same letters cases
+        # Rule 5: Uniqueness and Memorability (Simplified to just checking uniqueness)----using conceps of unique letters
+        # Determined password strength based whole score we got from combining scores at each rule 
+      \n
+ ''')
+passwords = ["WeakPwd", "Str0ngPwd!", "StrongPassword123!",
+             "12345678", "adminPassword", "unique1!Pass"]
+for pwd in passwords:
+    check_complexity(pwd)
+    print("-----")
+
+print(f"--------------------------------------------------------------------------------------")
+print(f"above are some random examples, you will get output as above formate!")
+print(f"--------------------------------------------------------------------------------------")
+user_test = input("enter the password you want to test: ")
+
+check_complexity(user_test)
+
+
+
+from mostusedpasswords import passwords
+
+
+class PasswordChecker:
+    def __init__(self, password):
+        self.password = password
+
+    def is_strong_password(self):
+        if len(self.password) < 8:
+            return False
+        if not any(char.isdigit() for char in self.password):
+            return False
+        if not any(char.islower() for char in self.password):
+            return False
+        if not any(char.isupper() for char in self.password):
+            return False
+        if not any(char in '!@#$%^&*()_+' for char in self.password):
+            return False
+        return True
+
+    def password_strength_checker(self):
+        score = 0
+
+        # Rule 1: Length
+        if len(self.password) >= 12:
+            score += 3
+        elif len(self.password) >= 8:
+            score += 2
+        else:
+            score += 1
+
+        # Rule 2: Character types
+        if any(char.isdigit() for char in self.password):
+            score += 1
+        if any(char.islower() for char in self.password):
+            score += 1
+        if any(char.isupper() for char in self.password):
+            score += 1
+        if any(char in '!@#$%^&*()_+' for char in self.password):
+            score += 1
+
+        # Rule 3: (simplified check, in reality you need a list of personal details) checked with most common passwords
+
+        if not any(detail.lower() in self.password.lower() for detail in passwords):
+            score += 2
+        else:
+            print(f"Your password is also in top 200 most used passwords list")
+
+        # Rule 4: Avoid maxm sequential characters and all same letters cases
+        sequential = 0
+        for i in range(len(self.password) - 1):
+            if ord(self.password[i+1]) == ord(self.password[i]) + 1:
+                sequential += 1
+
+        same = 0
+        for i in range(len(self.password) - 1):
+            if ord(self.password[i+1]) == ord(self.password[i]):
+                same += 1
+
+        if (same != (len(self.password) - 1)) & (sequential != len(self.password)//2):
+            score += 1
+
+        # Rule 5: Uniqueness and Memorability (Simplified to just checking uniqueness)----using conceps of unique letters
+        if len(set(self.password)) > len(self.password) // 2:
+            score += 1
+
+        # Determine password strength
+        if score <= 5:
+            strength = "Weak Password"
+        elif score <= 8:
+            strength = "Good Password"
+        else:
+            strength = "Strong Password"
+
+        return score, strength
+
+
+
+
+passwords = [
+    "12345", "123456", "123456789", "test1", "password", "12345678", "zinch",
+    "g_czechout", "asdf", "qwerty", "1234567890", "1234567", "Aa123456.",
+    "iloveyou", "1234", "abc123", "111111", "123123", "dubsmash", "test",
+    "princess", "qwertyuiop", "sunshine", "BvtTest123", "11111", "ashley",
+    "00000", "000000", "password1", "monkey", "livetest", "55555", "soccer",
+    "charlie", "asdfghjkl", "654321", "family", "michael", "123321", "football",
+    "baseball", "q1w2e3r4t5y6", "nicole", "jessica", "purple", "shadow",
+    "hannah", "chocolate", "michelle", "daniel", "maggie", "qwerty123", "hello",
+    "112233", "jordan", "tigger", "666666", "987654321", "superman", "12345678910",
+    "summer", "1q2w3e4r5t", "fitness", "bailey", "zxcvbnm", "fuckyou", "121212",
+    "buster", "butterfly", "dragon", "jennifer", "amanda", "justin", "cookie",
+    "basketball", "shopping", "pepper", "joshua", "hunter", "ginger", "matthew",
+    "abcd1234", "taylor", "samantha", "whatever", "andrew", "1qaz2wsx3edc",
+    "thomas", "jasmine", "animoto", "madison", "987654321", "54321", "flower",
+    "Password", "maria", "babygirl", "lovely", "sophie", "Chegg123", "computer",
+    "qwe123", "anthony", "1q2w3e4r", "peanut", "bubbles", "asdasd", "qwert",
+    "1qaz2wsx", "pakistan", "123qwe", "liverpool", "elizabeth", "harley",
+    "chelsea", "familia", "yellow", "william", "george", "7777777", "loveme",
+    "123abc", "letmein", "oliver", "batman", "cheese", "banana", "testing",
+    "secret", "angel", "friends", "jackson", "aaaaaa", "softball", "chicken",
+    "lauren", "andrea", "welcome", "asdfgh", "robert", "orange", "Testing1",
+    "pokemon", "555555", "melissa", "morgan", "123123123", "qazwsx", "diamond",
+    "brandon", "jesus", "mickey", "olivia", "changeme", "danielle", "victoria",
+    "gabriel", "123456a", "0.00000000", "loveyou", "hockey", "freedom",
+    "azerty", "snoopy", "skinny", "myheritage", "qwerty1", "159753", "forever",
+    "iloveu", "killer", "joseph", "master", "mustang", "hellokitty", "school",
+    "Password1", "patrick", "blink182", "tinkerbell", "rainbow", "nathan",
+    "cooper", "onedirection", "alexander", "jordan23", "lol123", "jasper",
+    "junior", "q1w2e3r4", "222222", "11111111", "benjamin", "jonathan",
+    "passw0rd", "123456789", "a123456", "samsung", "123", "love123", "password",
+    "123456", "123456789", "guest", "qwerty", "12345678"
+]
