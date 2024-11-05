@@ -1,0 +1,205 @@
+% Define destinations with their properties
+destination(bali, warm, 1000).
+destination(paris, mild, 1200).
+destination(siberia, cold, 800).
+destination(cancun, warm, 900).
+destination(london, mild, 1500).
+destination(dubai, hot, 2000).
+
+% Rule to suggest a destination based on climate preference and budget
+suggest_destination(Climate, Budget, Destination) :-
+    destination(Destination, Climate, Cost),
+    Cost =< Budget.
+
+% Example query
+% ?- suggest_destination(warm, 1000, Destination).
+
+
+
+
+
+
+% Define meetings with their start and end times (start_time, end_time).
+meeting(a, 9, 10).    % Meeting A from 9 AM to 10 AM
+meeting(b, 10, 11).   % Meeting B from 10 AM to 11 AM
+meeting(c, 10, 12).   % Meeting C from 10 AM to 12 PM
+meeting(d, 11, 12).   % Meeting D from 11 AM to 12 PM
+meeting(e, 13, 14).   % Meeting E from 1 PM to 2 PM
+
+% Rule to check if two meetings conflict
+conflict(Meeting1, Meeting2) :-
+    meeting(Meeting1, Start1, End1),
+    meeting(Meeting2, Start2, End2),
+    (Start1 < End2, Start2 < End1).
+
+% Rule to check if two meetings can happen on the same day
+can_happen_same_day(Meeting1, Meeting2) :-
+    Meeting1 \= Meeting2,
+    \+ conflict(Meeting1, Meeting2).
+
+% Example query
+% ?- can_happen_same_day(a, b).
+% ?- can_happen_same_day(a, c).
+
+
+
+
+
+
+% Define connected cities as facts
+connected(city_a, city_b).
+connected(city_b, city_c).
+connected(city_c, city_d).
+connected(city_a, city_d).
+connected(city_d, city_e).
+connected(city_e, city_f).
+connected(city_b, city_f).
+
+% Rule to check if there is a route between two cities
+route(City1, City2) :- 
+    connected(City1, City2).
+route(City1, City2) :- 
+    connected(City1, City3),
+    route(City3, City2).
+
+% Rule to find the shortest path using breadth-first search
+shortest_path(Start, End, Path) :- 
+    bfs([[Start]], End, RevPath), 
+    reverse(RevPath, Path).
+
+bfs([[End|Visited]|_], End, [End|Visited]).
+bfs([CurrentPath|Paths], End, ResultPath) :- 
+    CurrentPath = [Current|_],
+    findall(NewPath, (connected(Current, Next), \+ member(Next, CurrentPath), NewPath = [Next|CurrentPath]), NewPaths),
+    append(Paths, NewPaths, NewPaths2),
+    bfs(NewPaths2, End, ResultPath).
+
+% Example queries:
+% ?- route(city_a, city_f).
+% ?- shortest_path(city_a, city_f, Path).
+
+
+
+% Define recipes with their required ingredients
+recipe(spaghetti_bolognese, [tomatoes, pasta, ground_meat, onion, garlic]).
+recipe(caprese_salad, [tomatoes, mozzarella, basil, olive_oil]).
+recipe(vegetable_stir_fry, [broccoli, bell_pepper, soy_sauce, garlic]).
+recipe(pasta_primavera, [pasta, tomatoes, bell_pepper, zucchini]).
+recipe(tomato_soup, [tomatoes, onion, garlic, vegetable_broth]).
+recipe(pizza, [dough, tomatoes, mozzarella, basil]).
+
+% Rule to suggest recipes based on available ingredients
+can_cook(Recipe, Ingredients) :-
+    recipe(Recipe, RequiredIngredients),
+    subset(RequiredIngredients, Ingredients).
+
+% Example query
+% ?- can_cook(Recipe, [tomatoes, pasta]).
+
+
+
+
+
+
+
+-- Define the item type and their prices
+type Item = String
+type Price = Double
+type Discount = Double
+type Tax = Double
+
+-- Item prices
+itemPrices :: [(Item, Price)]
+itemPrices = [("item1", 100), ("item2", 200), ("item3", 150)]
+
+-- Discount and tax percentages
+discountPercentage :: Discount
+discountPercentage = 10.0  -- 10% discount
+
+taxPercentage :: Tax
+taxPercentage = 5.0  -- 5% tax
+
+-- Calculate total price for a list of items
+totalPrice :: [Item] -> Price
+totalPrice items = sum [price | (item, price) <- itemPrices, item elem items]
+
+-- Apply discount to the total price
+applyDiscount :: Price -> Price
+applyDiscount total = total - (total * discountPercentage / 100)
+
+-- Calculate tax on the discounted total
+calculateTax :: Price -> Price
+calculateTax discountedTotal = discountedTotal * taxPercentage / 100
+
+-- Generate final payable amount
+finalAmount :: [Item] -> Price
+finalAmount items =
+    let total = totalPrice items
+        discountedTotal = applyDiscount total
+        taxAmount = calculateTax discountedTotal
+    in discountedTotal + taxAmount
+
+-- Example usage
+main :: IO ()
+main = do
+    let items = ["item1", "item2"]
+    let amount = finalAmount items
+    putStrLn $ "Final amount for " ++ show items ++ ": " ++ show amount
+
+
+
+import qualified Data.Map as Map
+import qualified Data.Set as Set
+import Data.List (minimumBy)
+import Data.Ord (comparing)
+
+-- Define a type for the graph
+type Graph = Map.Map String [(String, Double)]  -- Node -> [(Neighbor, Distance)]
+
+-- Define a function to add edges to the graph
+addEdge :: Graph -> String -> String -> Double -> Graph
+addEdge graph from to distance =
+    Map.insertWith (++) from [(to, distance)] graph
+
+-- Example graph with distances
+exampleGraph :: Graph
+exampleGraph = addEdge (addEdge (addEdge (addEdge (addEdge Map.empty "A" "B" 5)
+                                                  "A" "C" 10)
+                                          "B" "C" 3)
+                                  "B" "D" 2)
+                          "C" "D" 1
+
+-- Function to find the shortest path using Dijkstra's algorithm
+dijkstra :: Graph -> String -> String -> Maybe (Double, [String])
+dijkstra graph start end = dijkstra' (Set.singleton start) [(0, [start])] Map.empty
+  where
+    dijkstra' _ [] _ = Nothing  -- No path found
+    dijkstra' visited ((cost, path@ (current: _)):rest) _ 
+      | current == end = Just (cost, reverse path)  -- Found the end
+      | otherwise = 
+          let neighbors = Map.findWithDefault [] current graph
+              newPaths = [(cost + distance, next: path) | (next, distance) <- neighbors, not (Set.member next visited)]
+              updatedVisited = Set.insert current visited
+          in dijkstra' updatedVisited (rest ++ newPaths) updatedVisited
+
+-- Example usage
+main :: IO ()
+main = do
+    let start = "A"
+    let end = "D"
+    case dijkstra exampleGraph start end of
+        Just (cost, path) -> putStrLn $ "Optimal route from " ++ start ++ " to " ++ end ++ ": " ++ show path ++ " with cost " ++ show cost
+        Nothing -> putStrLn $ "No route found from " ++ start ++ " to " ++ end
+
+
+
+[21-10-2024 13:55] Harsha (NIT): ghc -o RoutePlanner RoutePlanner.hs
+[21-10-2024 13:55] Harsha (NIT): ./RoutePlanner   # On Unix-based systems
+RoutePlanner.exe # On Windows
+
+
+
+swipl 
+gprolog 
+?- [your_file_name].  % Replace your_file_name with the name of your file, without .pl
+?- can_cook(Recipe, [tomatoes, pasta]).

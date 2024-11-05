@@ -1,0 +1,11 @@
+Few references on haskell programming are attached. 
+ To install haskell to your system use 
+
+sudo apt-get install haskell-platform
+
+then to check installation try
+
+ghci.
+
+
+Then complete the tasks-1 and 2  given on haskell
